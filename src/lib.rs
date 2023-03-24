@@ -110,7 +110,7 @@ pub fn init_loggery(filename: impl AsRef<Path>) -> Result<()> {
 #[macro_export]
 macro_rules! infoy {
     ($( $arg:tt )*) => {{
-        let logger = __LOGGER_INST__.lock().unwrap();
+        let logger = $crate::__LOGGER_INST__.lock().unwrap();
         logger.info(&format!("{}", format_args!($($arg)*)))
     }};
 }
@@ -118,7 +118,7 @@ macro_rules! infoy {
 #[macro_export]
 macro_rules! warny {
     ($( $arg:tt )*) => {{
-        let logger = __LOGGER_INST__.lock().unwrap();
+        let logger = $crate::__LOGGER_INST__.lock().unwrap();
         logger.warn(&format!("{}", format_args!($($arg)*)))
     }};
 }
@@ -126,7 +126,7 @@ macro_rules! warny {
 #[macro_export]
 macro_rules! errory {
     ($( $arg:tt )*) => {{
-        let logger = __LOGGER_INST__.lock().unwrap();
+        let logger = $crate::__LOGGER_INST__.lock().unwrap();
         logger.error(&format!("{}", format_args!($($arg)*)))
     }};
 }
@@ -134,7 +134,7 @@ macro_rules! errory {
 #[macro_export]
 macro_rules! todoy {
     ($( $arg:tt )*) => {{
-        let logger = __LOGGER_INST__.lock().unwrap();
+        let logger = $crate::__LOGGER_INST__.lock().unwrap();
         let _ = logger.todo(&format!("{}", format_args!($($arg)*)));
         todo!($($arg)*);
     }};
