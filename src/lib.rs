@@ -20,7 +20,7 @@ pub enum LogLevel {
 }
 
 impl fmt::Display for LogLevel {
-    pub fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::Error => write!(f, "[ERROR]"),
             Self::Warn => write!(f, "[WARN]"),
@@ -77,7 +77,7 @@ impl Logger {
 }
 
 impl Clone for Logger {
-    pub fn clone(&self) -> Self {
+    fn clone(&self) -> Self {
         let mut instance = Self::new();
         if let Some(ref file) = self.file {
             instance.file = file.try_clone().ok();
@@ -87,7 +87,7 @@ impl Clone for Logger {
 }
 
 impl Default for Logger {
-    pub fn default() -> Self {
+    fn default() -> Self {
         let mut instance = Self::new();
         let instance = instance.init(DEFAULT_FILENAME).unwrap();
         instance.clone()
@@ -95,7 +95,7 @@ impl Default for Logger {
 }
 
 impl Drop for Logger {
-    pub fn drop(&mut self) {
+    fn drop(&mut self) {
         if let Some(mut file) = self.file.take() {
             let _ = file.flush().unwrap();
         }
