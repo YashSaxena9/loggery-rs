@@ -2,6 +2,7 @@
 use anyhow::Result;
 use once_cell::sync::Lazy;
 use std::{
+    fmt,
     fs::{File, OpenOptions},
     io::Write,
     path::Path,
@@ -9,10 +10,25 @@ use std::{
 };
 
 const DEFAULT_FILENAME: &str = "./.yash.log";
-const ERROR: &str = "[ERROR]";
-const WARN: &str = "[WARN]";
-const INFO: &str = "[INFO]";
-const TODO: &str = "[TODO]";
+
+#[derive(Debug, Clone, Copy)]
+enum LogLevel {
+    Error,
+    Warn,
+    Info,
+    Todo,
+}
+
+impl fmt::Display for LogLevel {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::Error => write!(f, "[ERROR]"),
+            Self::Warn => write!(f, "[WARN]"),
+            Self::Info => write!(f, "[INFO]"),
+            Self::Todo => write!(f, "[TODO]"),
+        }
+    }
+}
 
 static LOGGER: Lazy<Mutex<Logger>> = Lazy::new(|| Mutex::new(Logger::default()));
 
@@ -35,31 +51,30 @@ impl Logger {
         Ok(self)
     }
 
-    fn info(&self, message: &str) -> Result<()> {
+    fn log_content(&self, log_level: LogLevel, message: &str) -> Result<()> {
         let mut file = self.file.as_ref().unwrap();
-        writeln!(file, "{} {}", INFO, message)?;
+        writeln!(file, "{} {}", log_level, message)?;
         file.flush()?;
+        Ok(())
+    }
+
+    fn info(&self, message: &str) -> Result<()> {
+        self.log_content(LogLevel::INFO, message)?;
         Ok(())
     }
 
     fn warn(&self, message: &str) -> Result<()> {
-        let mut file = self.file.as_ref().unwrap();
-        writeln!(file, "{} {}", WARN, message)?;
-        file.flush()?;
+        self.log_content(LogLevel::WARN, message)?;
         Ok(())
     }
 
     fn error(&self, message: &str) -> Result<()> {
-        let mut file = self.file.as_ref().unwrap();
-        writeln!(file, "{} {}", ERROR, message)?;
-        file.flush()?;
+        self.log_content(LogLevel::ERROR, message)?;
         Ok(())
     }
 
     fn todo(&self, message: &str) -> Result<()> {
-        let mut file = self.file.as_ref().unwrap();
-        writeln!(file, "{} {}", TODO, message)?;
-        file.flush()?;
+        self.log_content(LogLevel::TODO, message)?;
         Ok(())
     }
 }
