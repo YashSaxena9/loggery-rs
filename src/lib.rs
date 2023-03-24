@@ -30,9 +30,10 @@ impl fmt::Display for LogLevel {
     }
 }
 
-static LOGGER: Lazy<Mutex<Logger>> = Lazy::new(|| Mutex::new(Logger::default()));
+#[doc(hidden)]
+pub static __LOGGER_INST__: Lazy<Mutex<Logger>> = Lazy::new(|| Mutex::new(Logger::default()));
 
-struct Logger {
+pub struct Logger {
     file: Option<File>,
 }
 
@@ -59,23 +60,19 @@ impl Logger {
     }
 
     fn info(&self, message: &str) -> Result<()> {
-        self.log_content(LogLevel::Info, message)?;
-        Ok(())
+        self.log_content(LogLevel::Info, message)
     }
 
     fn warn(&self, message: &str) -> Result<()> {
-        self.log_content(LogLevel::Warn, message)?;
-        Ok(())
+        self.log_content(LogLevel::Warn, message)
     }
 
     fn error(&self, message: &str) -> Result<()> {
-        self.log_content(LogLevel::Error, message)?;
-        Ok(())
+        self.log_content(LogLevel::Error, message)
     }
 
     fn todo(&self, message: &str) -> Result<()> {
-        self.log_content(LogLevel::Todo, message)?;
-        Ok(())
+        self.log_content(LogLevel::Todo, message)
     }
 }
 
@@ -106,14 +103,14 @@ impl Drop for Logger {
 }
 
 pub fn init_loggery(filename: impl AsRef<Path>) -> Result<()> {
-    let _ = LOGGER.lock().unwrap().init(filename)?;
+    let _ = __LOGGER_INST__.lock().unwrap().init(filename)?;
     Ok(())
 }
 
 #[macro_export]
 macro_rules! infoy {
     ($( $arg:tt )*) => {{
-        let logger = LOGGER.lock().unwrap();
+        let logger = __LOGGER_INST__.lock().unwrap();
         logger.info(&format!("{}", format_args!($($arg)*)))
     }};
 }
@@ -121,7 +118,7 @@ macro_rules! infoy {
 #[macro_export]
 macro_rules! warny {
     ($( $arg:tt )*) => {{
-        let logger = LOGGER.lock().unwrap();
+        let logger = __LOGGER_INST__.lock().unwrap();
         logger.warn(&format!("{}", format_args!($($arg)*)))
     }};
 }
@@ -129,7 +126,7 @@ macro_rules! warny {
 #[macro_export]
 macro_rules! errory {
     ($( $arg:tt )*) => {{
-        let logger = LOGGER.lock().unwrap();
+        let logger = __LOGGER_INST__.lock().unwrap();
         logger.error(&format!("{}", format_args!($($arg)*)))
     }};
 }
@@ -137,7 +134,7 @@ macro_rules! errory {
 #[macro_export]
 macro_rules! todoy {
     ($( $arg:tt )*) => {{
-        let logger = LOGGER.lock().unwrap();
+        let logger = __LOGGER_INST__.lock().unwrap();
         let _ = logger.todo(&format!("{}", format_args!($($arg)*)));
         todo!($($arg)*);
     }};
