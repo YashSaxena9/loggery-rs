@@ -12,7 +12,7 @@ use std::{
 const DEFAULT_FILENAME: &str = "./.yash.log";
 
 #[derive(Debug, Clone, Copy)]
-enum LogLevel {
+pub enum LogLevel {
     Error,
     Warn,
     Info,
@@ -20,7 +20,7 @@ enum LogLevel {
 }
 
 impl fmt::Display for LogLevel {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    pub fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::Error => write!(f, "[ERROR]"),
             Self::Warn => write!(f, "[WARN]"),
@@ -38,11 +38,11 @@ pub struct Logger {
 }
 
 impl Logger {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self { file: None }
     }
 
-    fn init(&mut self, filename: impl AsRef<Path>) -> Result<&mut Self> {
+    pub fn init(&mut self, filename: impl AsRef<Path>) -> Result<&mut Self> {
         let file = OpenOptions::new()
             .create(true)
             .write(true)
@@ -52,32 +52,32 @@ impl Logger {
         Ok(self)
     }
 
-    fn log_content(&self, log_level: LogLevel, message: &str) -> Result<()> {
+    pub fn log_content(&self, log_level: LogLevel, message: &str) -> Result<()> {
         let mut file = self.file.as_ref().unwrap();
         writeln!(file, "{} {}", log_level, message)?;
         file.flush()?;
         Ok(())
     }
 
-    fn info(&self, message: &str) -> Result<()> {
+    pub fn info(&self, message: &str) -> Result<()> {
         self.log_content(LogLevel::Info, message)
     }
 
-    fn warn(&self, message: &str) -> Result<()> {
+    pub fn warn(&self, message: &str) -> Result<()> {
         self.log_content(LogLevel::Warn, message)
     }
 
-    fn error(&self, message: &str) -> Result<()> {
+    pub fn error(&self, message: &str) -> Result<()> {
         self.log_content(LogLevel::Error, message)
     }
 
-    fn todo(&self, message: &str) -> Result<()> {
+    pub fn todo(&self, message: &str) -> Result<()> {
         self.log_content(LogLevel::Todo, message)
     }
 }
 
 impl Clone for Logger {
-    fn clone(&self) -> Self {
+    pub fn clone(&self) -> Self {
         let mut instance = Self::new();
         if let Some(ref file) = self.file {
             instance.file = file.try_clone().ok();
@@ -87,7 +87,7 @@ impl Clone for Logger {
 }
 
 impl Default for Logger {
-    fn default() -> Self {
+    pub fn default() -> Self {
         let mut instance = Self::new();
         let instance = instance.init(DEFAULT_FILENAME).unwrap();
         instance.clone()
@@ -95,7 +95,7 @@ impl Default for Logger {
 }
 
 impl Drop for Logger {
-    fn drop(&mut self) {
+    pub fn drop(&mut self) {
         if let Some(mut file) = self.file.take() {
             let _ = file.flush().unwrap();
         }
