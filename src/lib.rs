@@ -59,22 +59,22 @@ impl Logger {
     }
 
     fn info(&self, message: &str) -> Result<()> {
-        self.log_content(LogLevel::INFO, message)?;
+        self.log_content(LogLevel::Info, message)?;
         Ok(())
     }
 
     fn warn(&self, message: &str) -> Result<()> {
-        self.log_content(LogLevel::WARN, message)?;
+        self.log_content(LogLevel::Warn, message)?;
         Ok(())
     }
 
     fn error(&self, message: &str) -> Result<()> {
-        self.log_content(LogLevel::ERROR, message)?;
+        self.log_content(LogLevel::Error, message)?;
         Ok(())
     }
 
     fn todo(&self, message: &str) -> Result<()> {
-        self.log_content(LogLevel::TODO, message)?;
+        self.log_content(LogLevel::Todo, message)?;
         Ok(())
     }
 }
